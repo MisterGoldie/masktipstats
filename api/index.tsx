@@ -117,5 +117,6 @@ app.frame('/', async (c) => {
   });
 });
 
+export const HEAD = handle(app);
 export const GET = handle(app);
 export const POST = handle(app);

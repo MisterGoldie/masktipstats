@@ -59,25 +59,8 @@ app.frame('/', async (c) => {
   if (status === 'initial') {
     return c.res({
       image: (
-        <div style={{
-          alignItems: 'center',
-          background: 'linear-gradient(to right, #432889, #17101F)',
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          justifyContent: 'center',
-          textAlign: 'center',
-          width: '100%',
-        }}>
-          <div style={{
-            color: 'white',
-            fontSize: 60,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)' }}>
+          <div style={{ color: 'white', fontSize: 60, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, padding: '0 120px', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
             Masks Tipping Frame
           </div>
         </div>
@@ -91,25 +74,8 @@ app.frame('/', async (c) => {
   if (buttonValue === 'fetch_user') {
     return c.res({
       image: (
-        <div style={{
-          alignItems: 'center',
-          background: 'linear-gradient(to right, #432889, #17101F)',
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          justifyContent: 'center',
-          textAlign: 'center',
-          width: '100%',
-        }}>
-          <div style={{
-            color: 'white',
-            fontSize: 40,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)' }}>
+          <div style={{ color: 'white', fontSize: 40, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, padding: '0 120px', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
             Enter Farcaster ID (fid) to fetch user details:
           </div>
         </div>
@@ -131,27 +97,8 @@ app.frame('/', async (c) => {
 
       return c.res({
         image: (
-          <div style={{
-            alignItems: 'center',
-            background: 'linear-gradient(to right, #432889, #17101F)',
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            justifyContent: 'center',
-            textAlign: 'center',
-            width: '100%',
-            padding: '40px',
-          }}>
-            <div style={{
-              color: 'white',
-              fontSize: 32,
-              fontStyle: 'normal',
-              letterSpacing: '-0.025em',
-              lineHeight: 1.4,
-              whiteSpace: 'pre-wrap',
-              textAlign: 'left',
-              width: '100%',
-            }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', padding: '40px' }}>
+            <div style={{ color: 'white', fontSize: 32, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, whiteSpace: 'pre-wrap', textAlign: 'left', width: '100%' }}>
               <div style={{ fontSize: 40, fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {inputText}:</div>
               <div>Username: {userDetails.userId}</div>
               <div>Followers: {userDetails.followerCount}</div>
@@ -174,25 +121,8 @@ app.frame('/', async (c) => {
     } catch (error) {
       return c.res({
         image: (
-          <div style={{
-            alignItems: 'center',
-            background: 'linear-gradient(to right, #FF0000, #8B0000)',
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            justifyContent: 'center',
-            textAlign: 'center',
-            width: '100%',
-          }}>
-            <div style={{
-              color: 'white',
-              fontSize: 40,
-              fontStyle: 'normal',
-              letterSpacing: '-0.025em',
-              lineHeight: 1.4,
-              padding: '0 120px',
-              whiteSpace: 'pre-wrap',
-            }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #FF0000, #8B0000)' }}>
+            <div style={{ color: 'white', fontSize: 40, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, padding: '0 120px', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
               Error fetching user data. Please try again.
             </div>
           </div>
@@ -205,29 +135,11 @@ app.frame('/', async (c) => {
     }
   }
 
-  // TODO: Implement tipping functionality
   if (buttonValue === 'tip_user') {
     return c.res({
       image: (
-        <div style={{
-          alignItems: 'center',
-          background: 'linear-gradient(to right, #432889, #17101F)',
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          justifyContent: 'center',
-          textAlign: 'center',
-          width: '100%',
-        }}>
-          <div style={{
-            color: 'white',
-            fontSize: 40,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)' }}>
+          <div style={{ color: 'white', fontSize: 40, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, padding: '0 120px', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
             Tipping functionality not yet implemented.
           </div>
         </div>
@@ -242,25 +154,8 @@ app.frame('/', async (c) => {
   // Default response if no conditions are met
   return c.res({
     image: (
-      <div style={{
-        alignItems: 'center',
-        background: 'linear-gradient(to right, #432889, #17101F)',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        justifyContent: 'center',
-        textAlign: 'center',
-        width: '100%',
-      }}>
-        <div style={{
-          color: 'white',
-          fontSize: 60,
-          fontStyle: 'normal',
-          letterSpacing: '-0.025em',
-          lineHeight: 1.4,
-          padding: '0 120px',
-          whiteSpace: 'pre-wrap',
-        }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)' }}>
+        <div style={{ color: 'white', fontSize: 60, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, padding: '0 120px', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
           Unexpected State
         </div>
       </div>

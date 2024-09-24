@@ -53,16 +53,22 @@ async function getMasksPerTip(): Promise<number> {
   return data.masksPerTip;
 }
 
+const StatBox = ({ title, value }: { title: string; value: string | number }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '10px', margin: '5px', backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: '10px', width: '45%' }}>
+    <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '5px' }}>{title}</div>
+    <div style={{ fontSize: '20px' }}>{value}</div>
+  </div>
+);
+
 app.frame('/', async (c) => {
   const { buttonValue, status, inputText } = c;
 
   if (status === 'initial') {
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)' }}>
-          <div style={{ color: 'white', fontSize: 60, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, padding: '0 120px', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
-            Masks Tipping Frame
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+          <div style={{ fontSize: 48, fontWeight: 'bold', marginBottom: '20px' }}>Masks Tipping Frame</div>
+          <div style={{ fontSize: 24 }}>Click to fetch user details</div>
         </div>
       ),
       intents: [
@@ -74,10 +80,9 @@ app.frame('/', async (c) => {
   if (buttonValue === 'fetch_user') {
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)' }}>
-          <div style={{ color: 'white', fontSize: 40, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, padding: '0 120px', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
-            Enter Farcaster ID (fid) to fetch user details:
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+          <div style={{ fontSize: 36, fontWeight: 'bold', marginBottom: '20px' }}>Enter Farcaster ID (fid)</div>
+          <div style={{ fontSize: 24 }}>to fetch user details</div>
         </div>
       ),
       intents: [
@@ -97,18 +102,19 @@ app.frame('/', async (c) => {
 
       return c.res({
         image: (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', padding: '40px' }}>
-            <div style={{ color: 'white', fontSize: 32, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, whiteSpace: 'pre-wrap', textAlign: 'left', width: '100%' }}>
-              <div style={{ fontSize: 40, fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {inputText}:</div>
-              <div>Username: {userDetails.userId}</div>
-              <div>Followers: {userDetails.followerCount}</div>
-              <div>Following: {userDetails.followingCount}</div>
-              <div style={{ marginTop: '20px', fontSize: 36, fontWeight: 'bold' }}>Account Balance:</div>
-              <div>MASK: {balanceData.MASK || 'N/A'}</div>
-              <div>ETH: {balanceData.ETH || 'N/A'}</div>
-              <div>WETH: {balanceData.WETH || 'N/A'}</div>
-              <div style={{ marginTop: '20px', fontSize: 36, fontWeight: 'bold' }}>Tipping Info:</div>
-              <div>$MASKS per tip: {masksPerTip}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif', padding: '20px' }}>
+            <div style={{ fontSize: 32, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>User Details for FID {inputText}</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around' }}>
+              <StatBox title="Username" value={userDetails.userId} />
+              <StatBox title="Followers" value={userDetails.followerCount} />
+              <StatBox title="Following" value={userDetails.followingCount} />
+              <StatBox title="$MASKS per tip" value={masksPerTip} />
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 'bold', marginTop: '20px', marginBottom: '10px' }}>Account Balance:</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around' }}>
+              <StatBox title="MASK" value={balanceData.MASK || 'N/A'} />
+              <StatBox title="ETH" value={balanceData.ETH || 'N/A'} />
+              <StatBox title="WETH" value={balanceData.WETH || 'N/A'} />
             </div>
           </div>
         ),
@@ -121,10 +127,9 @@ app.frame('/', async (c) => {
     } catch (error) {
       return c.res({
         image: (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #FF0000, #8B0000)' }}>
-            <div style={{ color: 'white', fontSize: 40, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, padding: '0 120px', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
-              Error fetching user data. Please try again.
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #FF0000, #8B0000)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+            <div style={{ fontSize: 36, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>Error fetching user data</div>
+            <div style={{ fontSize: 24, textAlign: 'center' }}>Please try again</div>
           </div>
         ),
         intents: [
@@ -138,10 +143,9 @@ app.frame('/', async (c) => {
   if (buttonValue === 'tip_user') {
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)' }}>
-          <div style={{ color: 'white', fontSize: 40, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, padding: '0 120px', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
-            Tipping functionality not yet implemented.
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+          <div style={{ fontSize: 36, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>Tipping functionality</div>
+          <div style={{ fontSize: 24, textAlign: 'center' }}>not yet implemented</div>
         </div>
       ),
       intents: [
@@ -154,10 +158,9 @@ app.frame('/', async (c) => {
   // Default response if no conditions are met
   return c.res({
     image: (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)' }}>
-        <div style={{ color: 'white', fontSize: 60, fontStyle: 'normal', letterSpacing: '-0.025em', lineHeight: 1.4, padding: '0 120px', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
-          Unexpected State
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+        <div style={{ fontSize: 48, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>Unexpected State</div>
+        <div style={{ fontSize: 24, textAlign: 'center' }}>Please reset and try again</div>
       </div>
     ),
     intents: [

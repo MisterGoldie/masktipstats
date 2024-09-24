@@ -81,7 +81,7 @@ app.frame('/', async (c) => {
           </div>
         ),
         intents: [
-          <Button value="refresh">Refresh Data</Button>,
+          <Button value="refresh">Refresh</Button>,
         ],
       });
     } catch (error) {
@@ -107,7 +107,7 @@ app.frame('/', async (c) => {
         <div style={{ display: 'flex', fontSize: 24 }}>Click to fetch your details</div>
       </div>
     ),
-    intents: [<Button value="get_user_details">Get User Details</Button>],
+    intents: [<Button value="get_user_details">Check $MASKS</Button>],
   });
 });
 

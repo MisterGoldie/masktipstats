@@ -9,15 +9,21 @@ const MASKS_PER_TIP_API_URL = 'https://app.masks.wtf/api/masksPerTip';
 const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 
-export const app = new Frog({
-  assetsPath: '/',
+export const app = new Frog({ //Always include if using Airstack so it tracks moxie
   basePath: '/api',
-  title: 'Masks Tipping Frame',
-});
-
-app.use(
+  imageOptions: { width: 1200, height: 628 },
+  title: '$Masks Token Tracker',
+  hub: {
+    apiUrl: "https://hubs.airstack.xyz",
+    fetchOptions: {
+      headers: {
+        "x-airstack-hubs": "103ba30da492d4a7e89e7026a6d3a234e", // Your Airstack API key
+      }
+    }
+  }
+}).use(
   neynar({
-    apiKey: NEYNAR_API_KEY,
+    apiKey: 'NEYNAR_FROG_FM',
     features: ['interactor', 'cast'],
   })
 );

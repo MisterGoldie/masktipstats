@@ -5,14 +5,46 @@ import { neynar } from 'frog/middlewares';
 
 const NEYNAR_API_KEY = 'NEYNAR_FROG_FM'; // Replace with your actual Neynar API key
 const MASKS_BALANCE_API_URL = 'https://app.masks.wtf/api/balance';
+const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
+const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 
 export const app = new Frog({
   assetsPath: '/',
   basePath: '/api',
-  title: 'Masks Account Balance',
+  title: 'Masks Tipping Frame',
 })
 
 app.use(neynar({ apiKey: NEYNAR_API_KEY, features: [] }));
+
+async function getFarcasterUserDetails(fid: string): Promise<any> {
+  const query = `
+    query GetFarcasterUserDetails {
+      Socials(
+        input: {filter: {dappName: {_eq: farcaster}, userId: {_eq: "${fid}"}}, blockchain: ethereum}
+      ) {
+        Social {
+          dappName
+          userId
+          profileImage
+          followerCount
+          followingCount
+        }
+      }
+    }
+  `;
+
+  const response = await fetch(AIRSTACK_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': AIRSTACK_API_KEY,
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  const data = await response.json();
+  return data.data.Socials.Social[0];
+}
 
 app.frame('/', async (c) => {
   const { buttonValue, status, inputText } = c;
@@ -39,17 +71,17 @@ app.frame('/', async (c) => {
             padding: '0 120px',
             whiteSpace: 'pre-wrap',
           }}>
-            Masks Account Balance
+            Masks Tipping Frame
           </div>
         </div>
       ),
       intents: [
-        <Button value="fetch_balance">Fetch Account Balance</Button>,
+        <Button value="fetch_user">Fetch User Details</Button>,
       ],
     });
   }
 
-  if (buttonValue === 'fetch_balance') {
+  if (buttonValue === 'fetch_user') {
     return c.res({
       image: (
         <div style={{
@@ -71,22 +103,23 @@ app.frame('/', async (c) => {
             padding: '0 120px',
             whiteSpace: 'pre-wrap',
           }}>
-            Enter Farcaster ID (fid) to fetch balance:
+            Enter Farcaster ID (fid) to fetch user details:
           </div>
         </div>
       ),
       intents: [
         <TextInput placeholder="Enter fid (e.g., 7472)" />,
-        <Button value="get_balance">Get Balance</Button>,
+        <Button value="get_user_details">Get User Details</Button>,
         <Button.Reset>Reset</Button.Reset>,
       ],
     });
   }
 
-  if (buttonValue === 'get_balance' && inputText) {
+  if (buttonValue === 'get_user_details' && inputText) {
     try {
-      const response = await fetch(`${MASKS_BALANCE_API_URL}?fid=${inputText}`);
-      const balanceData = await response.json();
+      const userDetails = await getFarcasterUserDetails(inputText);
+      const balanceResponse = await fetch(`${MASKS_BALANCE_API_URL}?fid=${inputText}`);
+      const balanceData = await balanceResponse.json();
 
       return c.res({
         image: (
@@ -102,14 +135,19 @@ app.frame('/', async (c) => {
           }}>
             <div style={{
               color: 'white',
-              fontSize: 40,
+              fontSize: 30,
               fontStyle: 'normal',
               letterSpacing: '-0.025em',
               lineHeight: 1.4,
               padding: '0 120px',
               whiteSpace: 'pre-wrap',
             }}>
-              {`Account Balance for FID ${inputText}:
+              {`User Details for FID ${inputText}:
+              Username: ${userDetails.userId}
+              Followers: ${userDetails.followerCount}
+              Following: ${userDetails.followingCount}
+              
+              Account Balance:
               MASK: ${balanceData.MASK || 'N/A'}
               ETH: ${balanceData.ETH || 'N/A'}
               WETH: ${balanceData.WETH || 'N/A'}`}
@@ -117,7 +155,8 @@ app.frame('/', async (c) => {
           </div>
         ),
         intents: [
-          <Button value="fetch_balance">Check Another Balance</Button>,
+          <Button value="tip_user">Tip User</Button>,
+          <Button value="fetch_user">Check Another User</Button>,
           <Button.Reset>Reset</Button.Reset>,
         ],
       });
@@ -143,16 +182,50 @@ app.frame('/', async (c) => {
               padding: '0 120px',
               whiteSpace: 'pre-wrap',
             }}>
-              Error fetching balance data. Please try again.
+              Error fetching user data. Please try again.
             </div>
           </div>
         ),
         intents: [
-          <Button value="fetch_balance">Try Again</Button>,
+          <Button value="fetch_user">Try Again</Button>,
           <Button.Reset>Reset</Button.Reset>,
         ],
       });
     }
+  }
+
+  // TODO: Implement tipping functionality
+  if (buttonValue === 'tip_user') {
+    return c.res({
+      image: (
+        <div style={{
+          alignItems: 'center',
+          background: 'linear-gradient(to right, #432889, #17101F)',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          justifyContent: 'center',
+          textAlign: 'center',
+          width: '100%',
+        }}>
+          <div style={{
+            color: 'white',
+            fontSize: 40,
+            fontStyle: 'normal',
+            letterSpacing: '-0.025em',
+            lineHeight: 1.4,
+            padding: '0 120px',
+            whiteSpace: 'pre-wrap',
+          }}>
+            Tipping functionality not yet implemented.
+          </div>
+        </div>
+      ),
+      intents: [
+        <Button value="fetch_user">Check Another User</Button>,
+        <Button.Reset>Reset</Button.Reset>,
+      ],
+    });
   }
 
   // Default response if no conditions are met

@@ -81,7 +81,6 @@ app.frame('/', async (c) => {
           </div>
         ),
         intents: [
-          <Button value="tip_user">Tip User</Button>,
           <Button value="refresh">Refresh Data</Button>,
         ],
       });

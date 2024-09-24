@@ -71,15 +71,13 @@ app.frame('/', async (c) => {
 
       return c.res({
         image: (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif', padding: '20px' }}>
-            <div style={{ fontSize: 32, fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {fid}</div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
-              <div style={{ fontSize: 24, marginBottom: '10px' }}>Username: {userDetails.userId || 'Unknown'}</div>
-              <div style={{ fontSize: 24, marginBottom: '10px' }}>Followers: {userDetails.followerCount}</div>
-              <div style={{ fontSize: 24, marginBottom: '10px' }}>Following: {userDetails.followingCount}</div>
-              <div style={{ fontSize: 24, marginBottom: '10px' }}>MASK Balance: {balanceData.MASK || 'N/A'}</div>
-              <div style={{ fontSize: 24, marginBottom: '10px' }}>$MASKS per tip: {masksPerTip}</div>
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif', padding: '20px' }}>
+            <div style={{ display: 'flex', fontSize: 32, fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {fid}</div>
+            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Username: {userDetails.userId || 'Unknown'}</div>
+            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Followers: {userDetails.followerCount}</div>
+            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Following: {userDetails.followingCount}</div>
+            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>MASK Balance: {balanceData.MASK || 'N/A'}</div>
+            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>$MASKS per tip: {masksPerTip}</div>
           </div>
         ),
         intents: [
@@ -92,8 +90,8 @@ app.frame('/', async (c) => {
       return c.res({
         image: (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #FF0000, #8B0000)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
-            <div style={{ fontSize: 36, fontWeight: 'bold', marginBottom: '20px' }}>Error fetching user data</div>
-            <div style={{ fontSize: 24 }}>Please try again</div>
+            <div style={{ display: 'flex', fontSize: 36, fontWeight: 'bold', marginBottom: '20px' }}>Error fetching user data</div>
+            <div style={{ display: 'flex', fontSize: 24 }}>Please try again</div>
           </div>
         ),
         intents: [
@@ -106,8 +104,8 @@ app.frame('/', async (c) => {
   return c.res({
     image: (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
-        <div style={{ fontSize: 48, fontWeight: 'bold', marginBottom: '20px' }}>Masks Tipping Frame</div>
-        <div style={{ fontSize: 24 }}>Click to fetch your details</div>
+        <div style={{ display: 'flex', fontSize: 48, fontWeight: 'bold', marginBottom: '20px' }}>Masks Tipping Frame</div>
+        <div style={{ display: 'flex', fontSize: 24 }}>Click to fetch your details</div>
       </div>
     ),
     intents: [<Button value="get_user_details">Get User Details</Button>],

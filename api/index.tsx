@@ -73,11 +73,13 @@ app.frame('/', async (c) => {
         image: (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif', padding: '20px' }}>
             <div style={{ fontSize: 32, fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {fid}</div>
-            <div style={{ fontSize: 24 }}>Username: {userDetails.userId || 'Unknown'}</div>
-            <div style={{ fontSize: 24 }}>Followers: {userDetails.followerCount}</div>
-            <div style={{ fontSize: 24 }}>Following: {userDetails.followingCount}</div>
-            <div style={{ fontSize: 24 }}>MASK Balance: {balanceData.MASK || 'N/A'}</div>
-            <div style={{ fontSize: 24 }}>$MASKS per tip: {masksPerTip}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
+              <div style={{ fontSize: 24, marginBottom: '10px' }}>Username: {userDetails.userId || 'Unknown'}</div>
+              <div style={{ fontSize: 24, marginBottom: '10px' }}>Followers: {userDetails.followerCount}</div>
+              <div style={{ fontSize: 24, marginBottom: '10px' }}>Following: {userDetails.followingCount}</div>
+              <div style={{ fontSize: 24, marginBottom: '10px' }}>MASK Balance: {balanceData.MASK || 'N/A'}</div>
+              <div style={{ fontSize: 24, marginBottom: '10px' }}>$MASKS per tip: {masksPerTip}</div>
+            </div>
           </div>
         ),
         intents: [
@@ -95,7 +97,7 @@ app.frame('/', async (c) => {
           </div>
         ),
         intents: [
-          <Button value="get user details">Try Again</Button>,
+          <Button value="get_user_details">Try Again</Button>,
         ],
       });
     }

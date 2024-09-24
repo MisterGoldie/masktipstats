@@ -5,6 +5,7 @@ import { neynar } from 'frog/middlewares';
 
 const NEYNAR_API_KEY = 'NEYNAR_FROG_FM'; // Replace with your actual Neynar API key
 const MASKS_BALANCE_API_URL = 'https://app.masks.wtf/api/balance';
+const MASKS_PER_TIP_API_URL = 'https://app.masks.wtf/api/masksPerTip';
 const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 
@@ -44,6 +45,12 @@ async function getFarcasterUserDetails(fid: string): Promise<any> {
 
   const data = await response.json();
   return data.data.Socials.Social[0];
+}
+
+async function getMasksPerTip(): Promise<number> {
+  const response = await fetch(MASKS_PER_TIP_API_URL);
+  const data = await response.json();
+  return data.masksPerTip;
 }
 
 app.frame('/', async (c) => {
@@ -120,6 +127,7 @@ app.frame('/', async (c) => {
       const userDetails = await getFarcasterUserDetails(inputText);
       const balanceResponse = await fetch(`${MASKS_BALANCE_API_URL}?fid=${inputText}`);
       const balanceData = await balanceResponse.json();
+      const masksPerTip = await getMasksPerTip();
 
       return c.res({
         image: (
@@ -132,25 +140,28 @@ app.frame('/', async (c) => {
             justifyContent: 'center',
             textAlign: 'center',
             width: '100%',
+            padding: '40px',
           }}>
             <div style={{
               color: 'white',
-              fontSize: 30,
+              fontSize: 32,
               fontStyle: 'normal',
               letterSpacing: '-0.025em',
               lineHeight: 1.4,
-              padding: '0 120px',
               whiteSpace: 'pre-wrap',
+              textAlign: 'left',
+              width: '100%',
             }}>
-              {`User Details for FID ${inputText}:
-              Username: ${userDetails.userId}
-              Followers: ${userDetails.followerCount}
-              Following: ${userDetails.followingCount}
-              
-              Account Balance:
-              MASK: ${balanceData.MASK || 'N/A'}
-              ETH: ${balanceData.ETH || 'N/A'}
-              WETH: ${balanceData.WETH || 'N/A'}`}
+              <div style={{ fontSize: 40, fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {inputText}:</div>
+              <div>Username: {userDetails.userId}</div>
+              <div>Followers: {userDetails.followerCount}</div>
+              <div>Following: {userDetails.followingCount}</div>
+              <div style={{ marginTop: '20px', fontSize: 36, fontWeight: 'bold' }}>Account Balance:</div>
+              <div>MASK: {balanceData.MASK || 'N/A'}</div>
+              <div>ETH: {balanceData.ETH || 'N/A'}</div>
+              <div>WETH: {balanceData.WETH || 'N/A'}</div>
+              <div style={{ marginTop: '20px', fontSize: 36, fontWeight: 'bold' }}>Tipping Info:</div>
+              <div>$MASKS per tip: {masksPerTip}</div>
             </div>
           </div>
         ),

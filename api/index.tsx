@@ -63,10 +63,23 @@ const StatBox = ({ title, value }: { title: string; value: string | number }) =>
 app.frame('/', async (c) => {
   const { buttonValue, status, inputText } = c;
 
+  const baseStyle = {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(to right, #432889, #17101F)',
+    color: 'white',
+    fontFamily: 'Arial, sans-serif',
+    padding: '20px',
+  };
+
   if (status === 'initial') {
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+        <div style={baseStyle}>
           <div style={{ fontSize: 48, fontWeight: 'bold', marginBottom: '20px' }}>Masks Tipping Frame</div>
           <div style={{ fontSize: 24 }}>Click to fetch user details</div>
         </div>
@@ -80,7 +93,7 @@ app.frame('/', async (c) => {
   if (buttonValue === 'fetch_user') {
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+        <div style={baseStyle}>
           <div style={{ fontSize: 36, fontWeight: 'bold', marginBottom: '20px' }}>Enter Farcaster ID (fid)</div>
           <div style={{ fontSize: 24 }}>to fetch user details</div>
         </div>
@@ -102,16 +115,16 @@ app.frame('/', async (c) => {
 
       return c.res({
         image: (
-          <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif', padding: '20px' }}>
+          <div style={{ ...baseStyle, justifyContent: 'flex-start' }}>
             <div style={{ fontSize: 32, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>User Details for FID {inputText}</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around', width: '100%' }}>
               <StatBox title="Username" value={userDetails.userId} />
               <StatBox title="Followers" value={userDetails.followerCount} />
               <StatBox title="Following" value={userDetails.followingCount} />
               <StatBox title="$MASKS per tip" value={masksPerTip} />
             </div>
-            <div style={{ fontSize: 24, fontWeight: 'bold', marginTop: '20px', marginBottom: '10px' }}>Account Balance:</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around' }}>
+            <div style={{ fontSize: 24, fontWeight: 'bold', marginTop: '20px', marginBottom: '10px', width: '100%', textAlign: 'center' }}>Account Balance:</div>
+            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around', width: '100%' }}>
               <StatBox title="MASK" value={balanceData.MASK || 'N/A'} />
               <StatBox title="ETH" value={balanceData.ETH || 'N/A'} />
               <StatBox title="WETH" value={balanceData.WETH || 'N/A'} />
@@ -127,7 +140,7 @@ app.frame('/', async (c) => {
     } catch (error) {
       return c.res({
         image: (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #FF0000, #8B0000)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+          <div style={baseStyle}>
             <div style={{ fontSize: 36, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>Error fetching user data</div>
             <div style={{ fontSize: 24, textAlign: 'center' }}>Please try again</div>
           </div>
@@ -143,7 +156,7 @@ app.frame('/', async (c) => {
   if (buttonValue === 'tip_user') {
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+        <div style={baseStyle}>
           <div style={{ fontSize: 36, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>Tipping functionality</div>
           <div style={{ fontSize: 24, textAlign: 'center' }}>not yet implemented</div>
         </div>
@@ -158,7 +171,7 @@ app.frame('/', async (c) => {
   // Default response if no conditions are met
   return c.res({
     image: (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+      <div style={baseStyle}>
         <div style={{ fontSize: 48, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>Unexpected State</div>
         <div style={{ fontSize: 24, textAlign: 'center' }}>Please reset and try again</div>
       </div>

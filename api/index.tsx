@@ -3,7 +3,7 @@ import { handle } from 'frog/vercel';
 import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
 
-const NEYNAR_API_KEY = 'NEYNAR_FROG_FM'; // Replace with your actual Neynar API key
+const NEYNAR_API_KEY = 'NEYNAR_FROG_FM';
 const MASKS_BALANCE_API_URL = 'https://app.masks.wtf/api/balance';
 const MASKS_PER_TIP_API_URL = 'https://app.masks.wtf/api/masksPerTip';
 const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
@@ -53,13 +53,6 @@ async function getMasksPerTip(): Promise<number> {
   return data.masksPerTip;
 }
 
-const StatBox = ({ title, value }: { title: string; value: string | number }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '10px', margin: '5px', backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: '10px', width: '45%' }}>
-    <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '5px' }}>{title}</div>
-    <div style={{ fontSize: '20px' }}>{value}</div>
-  </div>
-);
-
 app.frame('/', async (c) => {
   const { buttonValue, status, inputText } = c;
 
@@ -80,13 +73,11 @@ app.frame('/', async (c) => {
     return c.res({
       image: (
         <div style={baseStyle}>
-          <div style={{ fontSize: 48, fontWeight: 'bold', marginBottom: '20px' }}>Masks Tipping Frame</div>
-          <div style={{ fontSize: 24 }}>Click to fetch user details</div>
+          <div style={{ display: 'flex', fontSize: 48, fontWeight: 'bold', marginBottom: '20px' }}>Masks Tipping Frame</div>
+          <div style={{ display: 'flex', fontSize: 24 }}>Click to fetch user details</div>
         </div>
       ),
-      intents: [
-        <Button value="fetch_user">Fetch User Details</Button>,
-      ],
+      intents: [<Button value="fetch_user">Fetch User Details</Button>],
     });
   }
 
@@ -94,8 +85,8 @@ app.frame('/', async (c) => {
     return c.res({
       image: (
         <div style={baseStyle}>
-          <div style={{ fontSize: 36, fontWeight: 'bold', marginBottom: '20px' }}>Enter Farcaster ID (fid)</div>
-          <div style={{ fontSize: 24 }}>to fetch user details</div>
+          <div style={{ display: 'flex', fontSize: 36, fontWeight: 'bold', marginBottom: '20px' }}>Enter Farcaster ID (fid)</div>
+          <div style={{ display: 'flex', fontSize: 24 }}>to fetch user details</div>
         </div>
       ),
       intents: [
@@ -115,19 +106,23 @@ app.frame('/', async (c) => {
 
       return c.res({
         image: (
-          <div style={{ ...baseStyle, justifyContent: 'flex-start' }}>
-            <div style={{ fontSize: 32, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>User Details for FID {inputText}</div>
-            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around', width: '100%' }}>
-              <StatBox title="Username" value={userDetails.userId} />
-              <StatBox title="Followers" value={userDetails.followerCount} />
-              <StatBox title="Following" value={userDetails.followingCount} />
-              <StatBox title="$MASKS per tip" value={masksPerTip} />
-            </div>
-            <div style={{ fontSize: 24, fontWeight: 'bold', marginTop: '20px', marginBottom: '10px', width: '100%', textAlign: 'center' }}>Account Balance:</div>
-            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around', width: '100%' }}>
-              <StatBox title="MASK" value={balanceData.MASK || 'N/A'} />
-              <StatBox title="ETH" value={balanceData.ETH || 'N/A'} />
-              <StatBox title="WETH" value={balanceData.WETH || 'N/A'} />
+          <div style={baseStyle}>
+            <div style={{ display: 'flex', fontSize: 32, fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {inputText}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <div style={{ display: 'flex' }}>Username: {userDetails.userId}</div>
+                <div style={{ display: 'flex' }}>Followers: {userDetails.followerCount}</div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <div style={{ display: 'flex' }}>Following: {userDetails.followingCount}</div>
+                <div style={{ display: 'flex' }}>$MASKS per tip: {masksPerTip}</div>
+              </div>
+              <div style={{ display: 'flex', fontSize: 24, fontWeight: 'bold', marginTop: '20px', marginBottom: '10px' }}>Account Balance:</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex' }}>MASK: {balanceData.MASK || 'N/A'}</div>
+                <div style={{ display: 'flex' }}>ETH: {balanceData.ETH || 'N/A'}</div>
+                <div style={{ display: 'flex' }}>WETH: {balanceData.WETH || 'N/A'}</div>
+              </div>
             </div>
           </div>
         ),
@@ -141,8 +136,8 @@ app.frame('/', async (c) => {
       return c.res({
         image: (
           <div style={baseStyle}>
-            <div style={{ fontSize: 36, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>Error fetching user data</div>
-            <div style={{ fontSize: 24, textAlign: 'center' }}>Please try again</div>
+            <div style={{ display: 'flex', fontSize: 36, fontWeight: 'bold', marginBottom: '20px' }}>Error fetching user data</div>
+            <div style={{ display: 'flex', fontSize: 24 }}>Please try again</div>
           </div>
         ),
         intents: [
@@ -157,8 +152,8 @@ app.frame('/', async (c) => {
     return c.res({
       image: (
         <div style={baseStyle}>
-          <div style={{ fontSize: 36, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>Tipping functionality</div>
-          <div style={{ fontSize: 24, textAlign: 'center' }}>not yet implemented</div>
+          <div style={{ display: 'flex', fontSize: 36, fontWeight: 'bold', marginBottom: '20px' }}>Tipping functionality</div>
+          <div style={{ display: 'flex', fontSize: 24 }}>not yet implemented</div>
         </div>
       ),
       intents: [
@@ -168,17 +163,14 @@ app.frame('/', async (c) => {
     });
   }
 
-  // Default response if no conditions are met
   return c.res({
     image: (
       <div style={baseStyle}>
-        <div style={{ fontSize: 48, fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>Unexpected State</div>
-        <div style={{ fontSize: 24, textAlign: 'center' }}>Please reset and try again</div>
+        <div style={{ display: 'flex', fontSize: 48, fontWeight: 'bold', marginBottom: '20px' }}>Unexpected State</div>
+        <div style={{ display: 'flex', fontSize: 24 }}>Please reset and try again</div>
       </div>
     ),
-    intents: [
-      <Button.Reset>Reset</Button.Reset>,
-    ],
+    intents: [<Button.Reset>Reset</Button.Reset>],
   });
 });
 

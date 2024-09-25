@@ -1,7 +1,11 @@
+/** @jsxImportSource frog/jsx */
+
 import { Button, Frog } from 'frog';
-import { handle } from 'frog/vercel';
+import { handle } from 'frog/next';
 import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
+import fs from 'fs';
+import path from 'path';
 
 const MASKS_BALANCE_API_URL = 'https://app.masks.wtf/api/balance';
 const MASKS_PER_TIP_API_URL = 'https://app.masks.wtf/api/masksPerTip';
@@ -9,7 +13,21 @@ const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 const BACKGROUND_IMAGE_URL = 'https://bafybeiajbch2tb6veul2ydzqmzc62arz5vtpbycei3fcyehase5amv62we.ipfs.w3s.link/Frame%2059%20(5).png';
 
-export const app = new Frog({
+// Read and encode the TTF file
+const fontPath = path.join(process.cwd(), 'public', 'fonts', 'Chalkduster.ttf');
+const fontBase64 = fs.readFileSync(fontPath, { encoding: 'base64' });
+
+// Create a CSS rule for the font
+const fontFace = `
+  @font-face {
+    font-family: 'Chalkduster';
+    src: url(data:font/truetype;charset=utf-8;base64,${fontBase64}) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+`;
+
+const app = new Frog({
   basePath: '/api',
   imageOptions: { width: 1200, height: 628 },
   title: '$Masks Token Tracker',
@@ -81,24 +99,6 @@ async function getMasksPerTip(): Promise<number> {
   return data.masksPerTip;
 }
 
-function generateSVG(content: string): string {
-  return `
-    <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-      <image href="${BACKGROUND_IMAGE_URL}" width="1200" height="628"/>
-      ${content}
-    </svg>
-  `;
-}
-
-app.frame('/image', async (c) => {
-  const { searchParams } = new URL(c.req.url);
-  const content = searchParams.get('content') || '';
-  
-  return new Response(generateSVG(content), {
-    headers: { 'Content-Type': 'image/svg+xml' },
-  });
-});
-
 app.frame('/', async (c) => {
   const fid = c.frameData?.fid?.toString();
 
@@ -109,33 +109,138 @@ app.frame('/', async (c) => {
       const masksBalance = userAddress !== 'N/A' ? await getMasksBalance(userAddress) : 'N/A';
       const masksPerTip = await getMasksPerTip();
 
-      const content = `
-        <text x="50" y="80" font-family="Arial, sans-serif" font-size="32" fill="white" font-weight="bold">User Details for FID ${fid}</text>
-        <text x="50" y="140" font-family="Arial, sans-serif" font-size="24" fill="white">Username: ${userDetails.profileName || 'Unknown'}</text>
-        <text x="50" y="190" font-family="Arial, sans-serif" font-size="24" fill="white">Wallet: ${userAddress}</text>
-        <text x="50" y="240" font-family="Arial, sans-serif" font-size="24" fill="white">Followers: ${userDetails.followerCount}</text>
-        <text x="50" y="290" font-family="Arial, sans-serif" font-size="24" fill="white">Following: ${userDetails.followingCount}</text>
-        <text x="50" y="340" font-family="Arial, sans-serif" font-size="24" fill="white">MASK Balance: ${masksBalance}</text>
-        <text x="50" y="390" font-family="Arial, sans-serif" font-size="24" fill="white">$MASKS per tip: ${masksPerTip}</text>
-      `;
-
-      const imageUrl = `/api/image?content=${encodeURIComponent(content)}`;
-
       return c.res({
-        image: imageUrl,
+        image: (
+          <div style={{
+            position: 'relative',
+            width: '1200px',
+            height: '628px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            overflow: 'hidden',
+          }}>
+            <style>{fontFace}</style>
+            <img 
+              src={BACKGROUND_IMAGE_URL}
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: '40px',
+            }}>
+              <div style={{
+                color: 'white',
+                fontSize: '32px',
+                fontWeight: 'bold',
+                fontFamily: 'Chalkduster, Arial, sans-serif',
+                marginBottom: '20px',
+              }}>
+                User Details for FID {fid}
+              </div>
+              <div style={{
+                color: 'white',
+                fontSize: '24px',
+                fontFamily: 'Chalkduster, Arial, sans-serif',
+                marginBottom: '10px',
+              }}>
+                Username: {userDetails.profileName || 'Unknown'}
+              </div>
+              <div style={{
+                color: 'white',
+                fontSize: '24px',
+                fontFamily: 'Chalkduster, Arial, sans-serif',
+                marginBottom: '10px',
+              }}>
+                Wallet: {userAddress}
+              </div>
+              <div style={{
+                color: 'white',
+                fontSize: '24px',
+                fontFamily: 'Chalkduster, Arial, sans-serif',
+                marginBottom: '10px',
+              }}>
+                Followers: {userDetails.followerCount}
+              </div>
+              <div style={{
+                color: 'white',
+                fontSize: '24px',
+                fontFamily: 'Chalkduster, Arial, sans-serif',
+                marginBottom: '10px',
+              }}>
+                Following: {userDetails.followingCount}
+              </div>
+              <div style={{
+                color: 'white',
+                fontSize: '24px',
+                fontFamily: 'Chalkduster, Arial, sans-serif',
+                marginBottom: '10px',
+              }}>
+                MASK Balance: {masksBalance}
+              </div>
+              <div style={{
+                color: 'white',
+                fontSize: '24px',
+                fontFamily: 'Chalkduster, Arial, sans-serif',
+                marginBottom: '10px',
+              }}>
+                $MASKS per tip: {masksPerTip}
+              </div>
+            </div>
+          </div>
+        ),
         intents: [
           <Button value="refresh">Refresh</Button>,
         ],
       });
     } catch (error) {
       console.error('Error fetching user data:', error);
-      const errorContent = `
-        <text x="600" y="300" font-family="Arial, sans-serif" font-size="36" fill="white" text-anchor="middle">Error fetching user data</text>
-        <text x="600" y="350" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">Please try again</text>
-      `;
-      const imageUrl = `/api/image?content=${encodeURIComponent(errorContent)}`;
       return c.res({
-        image: imageUrl,
+        image: (
+          <div style={{
+            position: 'relative',
+            width: '1200px',
+            height: '628px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'hidden',
+          }}>
+            <style>{fontFace}</style>
+            <img 
+              src={BACKGROUND_IMAGE_URL}
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+            <div style={{
+              color: 'white',
+              fontSize: '36px',
+              fontWeight: 'bold',
+              fontFamily: 'Chalkduster, Arial, sans-serif',
+              textAlign: 'center',
+            }}>
+              Error fetching user data<br/>
+              Please try again
+            </div>
+          </div>
+        ),
         intents: [
           <Button value="refresh">Try Again</Button>,
         ],
@@ -143,13 +248,39 @@ app.frame('/', async (c) => {
     }
   }
 
-  const initialContent = `
-    <text x="600" y="300" font-family="Arial, sans-serif" font-size="48" fill="white" text-anchor="middle" font-weight="bold">Masks Tipping Frame</text>
-    <text x="600" y="360" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">Click to fetch your details</text>
-  `;
-  const imageUrl = `/api/image?content=${encodeURIComponent(initialContent)}`;
   return c.res({
-    image: imageUrl,
+    image: (
+      <div style={{
+        position: 'relative',
+        width: '1200px',
+        height: '628px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+      }}>
+        <style>{fontFace}</style>
+        <img 
+          src={BACKGROUND_IMAGE_URL}
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+        <div style={{
+          color: 'white',
+          fontSize: '48px',
+          fontWeight: 'bold',
+          fontFamily: 'Chalkduster, Arial, sans-serif',
+          textAlign: 'center',
+        }}>
+          Masks Tipping Frame<br/>
+          <span style={{ fontSize: '24px' }}>Click to fetch your details</span>
+        </div>
+      </div>
+    ),
     intents: [<Button value="refresh">Check $MASKS</Button>],
   });
 });

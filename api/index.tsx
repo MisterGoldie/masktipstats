@@ -108,15 +108,15 @@ app.frame('/', async (c) => {
 
       return c.res({
         image: (
-          <div style={{ fontFamily: 'CustomFont, sans-serif', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', width: '100%', height: '100%', padding: '20px' }}>
+          <div style={{ width: '1200px', height: '628px', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Chalkduster, Arial, sans-serif', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <style>{fontFace}</style>
-            <h1 style={{ fontSize: '32px', marginBottom: '20px' }}>User Details for FID {fid}</h1>
-            <p style={{ fontSize: '24px', marginBottom: '10px' }}>Username: {userDetails.profileName || 'Unknown'}</p>
-            <p style={{ fontSize: '24px', marginBottom: '10px' }}>Wallet: {userAddress}</p>
-            <p style={{ fontSize: '24px', marginBottom: '10px' }}>Followers: {userDetails.followerCount}</p>
-            <p style={{ fontSize: '24px', marginBottom: '10px' }}>Following: {userDetails.followingCount}</p>
-            <p style={{ fontSize: '24px', marginBottom: '10px' }}>MASK Balance: {masksBalance}</p>
-            <p style={{ fontSize: '24px', marginBottom: '10px' }}>$MASKS per tip: {masksPerTip}</p>
+            <div style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {fid}</div>
+            <div style={{ fontSize: '24px', marginBottom: '10px' }}>Username: {userDetails.profileName || 'Unknown'}</div>
+            <div style={{ fontSize: '24px', marginBottom: '10px' }}>Wallet: {userAddress}</div>
+            <div style={{ fontSize: '24px', marginBottom: '10px' }}>Followers: {userDetails.followerCount}</div>
+            <div style={{ fontSize: '24px', marginBottom: '10px' }}>Following: {userDetails.followingCount}</div>
+            <div style={{ fontSize: '24px', marginBottom: '10px' }}>MASK Balance: {masksBalance}</div>
+            <div style={{ fontSize: '24px', marginBottom: '10px' }}>$MASKS per tip: {masksPerTip}</div>
           </div>
         ),
         intents: [
@@ -127,10 +127,10 @@ app.frame('/', async (c) => {
       console.error('Error fetching user data:', error);
       return c.res({
         image: (
-          <div style={{ fontFamily: 'CustomFont, sans-serif', background: 'linear-gradient(to right, #FF0000, #8B0000)', color: 'white', width: '100%', height: '100%', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: '1200px', height: '628px', background: 'linear-gradient(to right, #FF0000, #8B0000)', color: 'white', fontFamily: 'Chalkduster, Arial, sans-serif', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <style>{fontFace}</style>
-            <h1 style={{ fontSize: '36px', marginBottom: '20px' }}>Error fetching user data</h1>
-            <p style={{ fontSize: '24px' }}>Please try again</p>
+            <div style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '20px' }}>Error fetching user data</div>
+            <div style={{ fontSize: '24px' }}>Please try again</div>
           </div>
         ),
         intents: [
@@ -142,10 +142,10 @@ app.frame('/', async (c) => {
 
   return c.res({
     image: (
-      <div style={{ fontFamily: 'CustomFont, sans-serif', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', width: '100%', height: '100%', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: '1200px', height: '628px', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Chalkduster, Arial, sans-serif', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <style>{fontFace}</style>
-        <h1 style={{ fontSize: '48px', marginBottom: '20px' }}>Masks Tipping Frame</h1>
-        <p style={{ fontSize: '24px' }}>Click to fetch your details</p>
+        <div style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '20px' }}>Masks Tipping Frame</div>
+        <div style={{ fontSize: '24px' }}>Click to fetch your details</div>
       </div>
     ),
     intents: [<Button value="refresh">Check $MASKS</Button>],

@@ -81,6 +81,24 @@ async function getMasksPerTip(): Promise<number> {
   return data.masksPerTip;
 }
 
+function generateSVG(content: string): string {
+  return `
+    <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <image href="${BACKGROUND_IMAGE_URL}" width="1200" height="628"/>
+      ${content}
+    </svg>
+  `;
+}
+
+app.frame('/image', async (c) => {
+  const { searchParams } = new URL(c.req.url);
+  const content = searchParams.get('content') || '';
+  
+  return new Response(generateSVG(content), {
+    headers: { 'Content-Type': 'image/svg+xml' },
+  });
+});
+
 app.frame('/', async (c) => {
   const fid = c.frameData?.fid?.toString();
 
@@ -91,35 +109,33 @@ app.frame('/', async (c) => {
       const masksBalance = userAddress !== 'N/A' ? await getMasksBalance(userAddress) : 'N/A';
       const masksPerTip = await getMasksPerTip();
 
-      const imageContent = `
-        <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-          <image href="${BACKGROUND_IMAGE_URL}" width="1200" height="628"/>
-          <text x="50" y="80" font-family="Arial, sans-serif" font-size="32" fill="white" font-weight="bold">User Details for FID ${fid}</text>
-          <text x="50" y="140" font-family="Arial, sans-serif" font-size="24" fill="white">Username: ${userDetails.profileName || 'Unknown'}</text>
-          <text x="50" y="190" font-family="Arial, sans-serif" font-size="24" fill="white">Wallet: ${userAddress}</text>
-          <text x="50" y="240" font-family="Arial, sans-serif" font-size="24" fill="white">Followers: ${userDetails.followerCount}</text>
-          <text x="50" y="290" font-family="Arial, sans-serif" font-size="24" fill="white">Following: ${userDetails.followingCount}</text>
-          <text x="50" y="340" font-family="Arial, sans-serif" font-size="24" fill="white">MASK Balance: ${masksBalance}</text>
-          <text x="50" y="390" font-family="Arial, sans-serif" font-size="24" fill="white">$MASKS per tip: ${masksPerTip}</text>
-        </svg>
+      const content = `
+        <text x="50" y="80" font-family="Arial, sans-serif" font-size="32" fill="white" font-weight="bold">User Details for FID ${fid}</text>
+        <text x="50" y="140" font-family="Arial, sans-serif" font-size="24" fill="white">Username: ${userDetails.profileName || 'Unknown'}</text>
+        <text x="50" y="190" font-family="Arial, sans-serif" font-size="24" fill="white">Wallet: ${userAddress}</text>
+        <text x="50" y="240" font-family="Arial, sans-serif" font-size="24" fill="white">Followers: ${userDetails.followerCount}</text>
+        <text x="50" y="290" font-family="Arial, sans-serif" font-size="24" fill="white">Following: ${userDetails.followingCount}</text>
+        <text x="50" y="340" font-family="Arial, sans-serif" font-size="24" fill="white">MASK Balance: ${masksBalance}</text>
+        <text x="50" y="390" font-family="Arial, sans-serif" font-size="24" fill="white">$MASKS per tip: ${masksPerTip}</text>
       `;
 
+      const imageUrl = `/api/image?content=${encodeURIComponent(content)}`;
+
       return c.res({
-        image: imageContent,
+        image: imageUrl,
         intents: [
           <Button value="refresh">Refresh</Button>,
         ],
       });
     } catch (error) {
       console.error('Error fetching user data:', error);
+      const errorContent = `
+        <text x="600" y="300" font-family="Arial, sans-serif" font-size="36" fill="white" text-anchor="middle">Error fetching user data</text>
+        <text x="600" y="350" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">Please try again</text>
+      `;
+      const imageUrl = `/api/image?content=${encodeURIComponent(errorContent)}`;
       return c.res({
-        image: `
-          <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <image href="${BACKGROUND_IMAGE_URL}" width="1200" height="628"/>
-            <text x="600" y="300" font-family="Arial, sans-serif" font-size="36" fill="white" text-anchor="middle">Error fetching user data</text>
-            <text x="600" y="350" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">Please try again</text>
-          </svg>
-        `,
+        image: imageUrl,
         intents: [
           <Button value="refresh">Try Again</Button>,
         ],
@@ -127,14 +143,13 @@ app.frame('/', async (c) => {
     }
   }
 
+  const initialContent = `
+    <text x="600" y="300" font-family="Arial, sans-serif" font-size="48" fill="white" text-anchor="middle" font-weight="bold">Masks Tipping Frame</text>
+    <text x="600" y="360" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">Click to fetch your details</text>
+  `;
+  const imageUrl = `/api/image?content=${encodeURIComponent(initialContent)}`;
   return c.res({
-    image: `
-      <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-        <image href="${BACKGROUND_IMAGE_URL}" width="1200" height="628"/>
-        <text x="600" y="300" font-family="Arial, sans-serif" font-size="48" fill="white" text-anchor="middle" font-weight="bold">Masks Tipping Frame</text>
-        <text x="600" y="360" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">Click to fetch your details</text>
-      </svg>
-    `,
+    image: imageUrl,
     intents: [<Button value="refresh">Check $MASKS</Button>],
   });
 });

@@ -3,13 +3,13 @@ import { handle } from 'frog/vercel';
 import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
 
-const NEYNAR_API_KEY = 'NEYNAR_FROG_FM';
 const MASKS_BALANCE_API_URL = 'https://app.masks.wtf/api/balance';
 const MASKS_PER_TIP_API_URL = 'https://app.masks.wtf/api/masksPerTip';
+const MASKS_RANK_API_URL = 'https://app.masks.wtf/api/rank';
 const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 
-export const app = new Frog({ //Always include if using Airstack so it tracks moxie
+export const app = new Frog({
   basePath: '/api',
   imageOptions: { width: 1200, height: 628 },
   title: '$Masks Token Tracker',
@@ -17,7 +17,7 @@ export const app = new Frog({ //Always include if using Airstack so it tracks mo
     apiUrl: "https://hubs.airstack.xyz",
     fetchOptions: {
       headers: {
-        "x-airstack-hubs": "103ba30da492d4a7e89e7026a6d3a234e", // Your Airstack API key
+        "x-airstack-hubs": "103ba30da492d4a7e89e7026a6d3a234e",
       }
     }
   }
@@ -64,6 +64,12 @@ async function getMasksPerTip(): Promise<number> {
   return data.masksPerTip;
 }
 
+async function getMasksRank(fid: string): Promise<number> {
+  const response = await fetch(`${MASKS_RANK_API_URL}?fid=${fid}`);
+  const data = await response.json();
+  return data.rank;
+}
+
 app.frame('/', async (c) => {
   const { buttonValue } = c;
   const fid = c.frameData?.fid?.toString();
@@ -74,6 +80,7 @@ app.frame('/', async (c) => {
       const balanceResponse = await fetch(`${MASKS_BALANCE_API_URL}?fid=${fid}`);
       const balanceData = await balanceResponse.json();
       const masksPerTip = await getMasksPerTip();
+      const masksRank = await getMasksRank(fid);
 
       return c.res({
         image: (
@@ -84,6 +91,7 @@ app.frame('/', async (c) => {
             <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Following: {userDetails.followingCount}</div>
             <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>MASK Balance: {balanceData.MASK || 'N/A'}</div>
             <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>$MASKS per tip: {masksPerTip}</div>
+            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>$MASKS Rank: {masksRank}</div>
           </div>
         ),
         intents: [
@@ -117,6 +125,5 @@ app.frame('/', async (c) => {
   });
 });
 
-export const HEAD = handle(app);
 export const GET = handle(app);
 export const POST = handle(app);

@@ -2,17 +2,11 @@ import { Button, Frog } from 'frog';
 import { handle } from 'frog/vercel';
 import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
-import fs from 'fs';
-import path from 'path';
 
 const MASKS_BALANCE_API_URL = 'https://app.masks.wtf/api/balance';
 const MASKS_PER_TIP_API_URL = 'https://app.masks.wtf/api/masksPerTip';
 const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
-
-// Read and encode the TTF file
-const fontPath = path.join(process.cwd(), 'public', 'fonts', 'Chalkduster.ttf');
-const fontBase64 = fs.readFileSync(fontPath, { encoding: 'base64' });
 
 export const app = new Frog({
   basePath: '/api',
@@ -97,38 +91,22 @@ app.frame('/', async (c) => {
       const masksPerTip = await getMasksPerTip();
 
       const imageContent = `
-        <html>
-          <head>
-            <style>
-              @font-face {
-                font-family: 'Chalkduster';
-                src: url(data:font/truetype;charset=utf-8;base64,${fontBase64}) format('truetype');
-              }
-              body {
-                font-family: 'Chalkduster';
-                background: linear-gradient(to right, #432889, #17101F);
-                color: white;
-                width: 1200px;
-                height: 628px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                padding: 20px;
-              }
-              h1 { font-size: 32px; margin-bottom: 20px; }
-              p { font-size: 24px; margin-bottom: 10px; }
-            </style>
-          </head>
-          <body>
-            <h1>User Details for FID ${fid}</h1>
-            <p>Username: ${userDetails.profileName || 'Unknown'}</p>
-            <p>Wallet: ${userAddress}</p>
-            <p>Followers: ${userDetails.followerCount}</p>
-            <p>Following: ${userDetails.followingCount}</p>
-            <p>MASK Balance: ${masksBalance}</p>
-            <p>$MASKS per tip: ${masksPerTip}</p>
-          </body>
-        </html>
+        <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#432889;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#17101F;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <rect width="1200" height="628" fill="url(#grad)"/>
+          <text x="50" y="80" font-family="Courier, monospace" font-size="32" fill="white" font-weight="bold">User Details for FID ${fid}</text>
+          <text x="50" y="140" font-family="Courier, monospace" font-size="24" fill="white">Username: ${userDetails.profileName || 'Unknown'}</text>
+          <text x="50" y="190" font-family="Courier, monospace" font-size="24" fill="white">Wallet: ${userAddress}</text>
+          <text x="50" y="240" font-family="Courier, monospace" font-size="24" fill="white">Followers: ${userDetails.followerCount}</text>
+          <text x="50" y="290" font-family="Courier, monospace" font-size="24" fill="white">Following: ${userDetails.followingCount}</text>
+          <text x="50" y="340" font-family="Courier, monospace" font-size="24" fill="white">MASK Balance: ${masksBalance}</text>
+          <text x="50" y="390" font-family="Courier, monospace" font-size="24" fill="white">$MASKS per tip: ${masksPerTip}</text>
+        </svg>
       `;
 
       return c.res({
@@ -141,34 +119,11 @@ app.frame('/', async (c) => {
       console.error('Error fetching user data:', error);
       return c.res({
         image: `
-          <html>
-            <head>
-              <style>
-                @font-face {
-                  font-family: 'Chalkduster';
-                  src: url(data:font/truetype;charset=utf-8;base64,${fontBase64}) format('truetype');
-                }
-                body {
-                  font-family: 'Chalkduster';
-                  background: linear-gradient(to right, #FF0000, #8B0000);
-                  color: white;
-                  width: 1200px;
-                  height: 628px;
-                  display: flex;
-                  flex-direction: column;
-                  justify-content: center;
-                  align-items: center;
-                  padding: 20px;
-                }
-                h1 { font-size: 36px; margin-bottom: 20px; }
-                p { font-size: 24px; }
-              </style>
-            </head>
-            <body>
-              <h1>Error fetching user data</h1>
-              <p>Please try again</p>
-            </body>
-          </html>
+          <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1200" height="628" fill="#FF0000"/>
+            <text x="600" y="300" font-family="Courier, monospace" font-size="36" fill="white" text-anchor="middle">Error fetching user data</text>
+            <text x="600" y="350" font-family="Courier, monospace" font-size="24" fill="white" text-anchor="middle">Please try again</text>
+          </svg>
         `,
         intents: [
           <Button value="refresh">Try Again</Button>,
@@ -179,34 +134,17 @@ app.frame('/', async (c) => {
 
   return c.res({
     image: `
-      <html>
-        <head>
-          <style>
-            @font-face {
-              font-family: 'Chalkduster';
-              src: url(data:font/truetype;charset=utf-8;base64,${fontBase64}) format('truetype');
-            }
-            body {
-              font-family: 'Chalkduster';
-              background: linear-gradient(to right, #432889, #17101F);
-              color: white;
-              width: 1200px;
-              height: 628px;
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
-              align-items: center;
-              padding: 20px;
-            }
-            h1 { font-size: 48px; margin-bottom: 20px; }
-            p { font-size: 24px; }
-          </style>
-        </head>
-        <body>
-          <h1>Masks Tipping Frame</h1>
-          <p>Click to fetch your details</p>
-        </body>
-      </html>
+      <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#432889;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#17101F;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="628" fill="url(#grad)"/>
+        <text x="600" y="300" font-family="Courier, monospace" font-size="48" fill="white" text-anchor="middle" font-weight="bold">Masks Tipping Frame</text>
+        <text x="600" y="360" font-family="Courier, monospace" font-size="24" fill="white" text-anchor="middle">Click to fetch your details</text>
+      </svg>
     `,
     intents: [<Button value="refresh">Check $MASKS</Button>],
   });

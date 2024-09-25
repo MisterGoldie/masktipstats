@@ -123,7 +123,7 @@ app.frame('/', (c) => {
   });
 });
 
-app.frame('/', async (c) => {
+app.frame('/check', async (c) => {
   const { buttonValue, frameData } = c;
   
   if (buttonValue !== 'Check $MASKS stats') {

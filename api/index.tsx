@@ -3,7 +3,6 @@ import { handle } from 'frog/vercel';
 import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
 
-const NEYNAR_API_KEY = 'NEYNAR_FROG_FM';
 const MASKS_BALANCE_API_URL = 'https://app.masks.wtf/api/balance';
 const MASKS_PER_TIP_API_URL = 'https://app.masks.wtf/api/masksPerTip';
 const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
@@ -28,19 +27,36 @@ export const app = new Frog({
   })
 );
 
-async function getFarcasterUserDetails(fid: string) {
+interface ConnectedAddress {
+  address: string;
+  blockchain: string;
+}
+
+interface UserDetails {
+  dappName: string;
+  profileName: string;
+  userId: string;
+  followerCount: number;
+  followingCount: number;
+  connectedAddresses: ConnectedAddress[];
+}
+
+async function getFarcasterUserDetails(fid: string): Promise<UserDetails> {
   const query = `
-    query GetFarcasterUserDetails {
+    query GetUserConnectedWalletAddress {
       Socials(
         input: {filter: {dappName: {_eq: farcaster}, userId: {_eq: "${fid}"}}, blockchain: ethereum}
       ) {
         Social {
           dappName
+          profileName
           userId
-          profileImage
           followerCount
           followingCount
-          userAssociatedAddresses
+          connectedAddresses {
+            address
+            blockchain
+          }
         }
       }
     }
@@ -72,21 +88,21 @@ async function getMasksPerTip(): Promise<number> {
 }
 
 app.frame('/', async (c) => {
-  const { buttonValue } = c;
   const fid = c.frameData?.fid?.toString();
 
-  if (buttonValue === 'get_user_details' && fid) {
+  if (fid) {
     try {
       const userDetails = await getFarcasterUserDetails(fid);
-      const userAddress = userDetails.userAssociatedAddresses?.[0];
-      const masksBalance = userAddress ? await getMasksBalance(userAddress) : 'N/A';
+      const userAddress = userDetails.connectedAddresses?.find((addr: ConnectedAddress) => addr.blockchain === 'ethereum')?.address || 'N/A';
+      const masksBalance = userAddress !== 'N/A' ? await getMasksBalance(userAddress) : 'N/A';
       const masksPerTip = await getMasksPerTip();
 
       return c.res({
         image: (
           <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Arial, sans-serif', padding: '20px' }}>
             <div style={{ display: 'flex', fontSize: 32, fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {fid}</div>
-            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Username: {userDetails.userId || 'Unknown'}</div>
+            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Username: {userDetails.profileName || 'Unknown'}</div>
+            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Wallet: {userAddress}</div>
             <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Followers: {userDetails.followerCount}</div>
             <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Following: {userDetails.followingCount}</div>
             <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>MASK Balance: {masksBalance}</div>
@@ -107,7 +123,7 @@ app.frame('/', async (c) => {
           </div>
         ),
         intents: [
-          <Button value="get_user_details">Try Again</Button>,
+          <Button value="refresh">Try Again</Button>,
         ],
       });
     }
@@ -120,7 +136,7 @@ app.frame('/', async (c) => {
         <div style={{ display: 'flex', fontSize: 24 }}>Click to fetch your details</div>
       </div>
     ),
-    intents: [<Button value="get_user_details">Check $MASKS</Button>],
+    intents: [<Button value="refresh">Check $MASKS</Button>],
   });
 });
 

@@ -110,7 +110,7 @@ app.frame('/', (c) => {
       <meta property="fc:frame" content="vNext">
       <meta property="fc:frame:image" content="${BACKGROUND_IMAGE_URL}">
       <meta property="fc:frame:button:1" content="Check $MASKS stats">
-      <meta property="fc:frame:post_url" content="${c.url}/api/check">
+      <meta property="fc:frame:post_url" content="${c.url}">
     </head>
     <body>
       <h1>$MASKS Token Tracker. Check your $MASKS balance.</h1>
@@ -123,8 +123,36 @@ app.frame('/', (c) => {
   });
 });
 
-app.frame('/check', async (c) => {
-  const { fid } = c.frameData ?? {};
+app.frame('/', async (c) => {
+  const { buttonValue, frameData } = c;
+  
+  if (buttonValue !== 'Check $MASKS stats') {
+    return c.res({
+      image: (
+        <div style={{
+          backgroundImage: `url(${BACKGROUND_IMAGE_URL})`,
+          width: '1200px',
+          height: '628px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: 'white',
+          fontSize: '40px',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          fontFamily: 'Chalkduster, Arial, sans-serif',
+        }}>
+          <style>{fontFace}</style>
+          <div>Welcome to $MASKS Token Tracker</div>
+        </div>
+      ),
+      intents: [
+        <Button value="Check $MASKS stats">Check $MASKS stats</Button>
+      ],
+    });
+  }
+
+  const fid = frameData?.fid?.toString();
   const { displayName } = c.var.interactor || {};
 
   if (!fid) {
@@ -148,13 +176,13 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        <Button action="/">Try Again</Button>
+        <Button value="Check $MASKS stats">Try Again</Button>
       ],
     });
   }
 
   try {
-    const userDetails = await getFarcasterUserDetails(fid.toString());
+    const userDetails = await getFarcasterUserDetails(fid);
     const userAddress = userDetails.connectedAddresses?.find((addr: ConnectedAddress) => addr.blockchain === 'ethereum')?.address || 'N/A';
     const masksBalance = userAddress !== 'N/A' ? await getMasksBalance(userAddress) : 'N/A';
     const masksPerTip = await getMasksPerTip();
@@ -205,8 +233,7 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        <Button action="/">Home</Button>,
-        <Button action="/check">Refresh</Button>
+        <Button value="Check $MASKS stats">Refresh</Button>
       ],
     });
   } catch (error) {
@@ -231,7 +258,7 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        <Button action="/check">Try Again</Button>
+        <Button value="Check $MASKS stats">Try Again</Button>
       ],
     });
   }

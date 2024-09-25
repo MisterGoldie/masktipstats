@@ -1,7 +1,7 @@
 /** @jsxImportSource frog/jsx */
 
 import { Button, Frog } from 'frog';
-import { handle } from 'frog/next';
+import { handle } from 'frog/vercel';
 import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
 import fs from 'fs';
@@ -27,7 +27,7 @@ const fontFace = `
   }
 `;
 
-const app = new Frog({
+export const app = new Frog({
   basePath: '/api',
   imageOptions: { width: 1200, height: 628 },
   title: '$Masks Token Tracker',
@@ -99,190 +99,142 @@ async function getMasksPerTip(): Promise<number> {
   return data.masksPerTip;
 }
 
-app.frame('/', async (c) => {
-  const fid = c.frameData?.fid?.toString();
+app.frame('/', (c) => {
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>$MASKS Token Tracker</title>
+      <meta property="fc:frame" content="vNext">
+      <meta property="fc:frame:image" content="${BACKGROUND_IMAGE_URL}">
+      <meta property="fc:frame:button:1" content="Check $MASKS stats">
+      <meta property="fc:frame:post_url" content="${c.url}/api/check">
+    </head>
+    <body>
+      <h1>$MASKS Token Tracker. Check your $MASKS balance.</h1>
+    </body>
+    </html>
+  `;
 
-  if (fid) {
-    try {
-      const userDetails = await getFarcasterUserDetails(fid);
-      const userAddress = userDetails.connectedAddresses?.find((addr: ConnectedAddress) => addr.blockchain === 'ethereum')?.address || 'N/A';
-      const masksBalance = userAddress !== 'N/A' ? await getMasksBalance(userAddress) : 'N/A';
-      const masksPerTip = await getMasksPerTip();
+  return new Response(html, {
+    headers: { 'Content-Type': 'text/html' },
+  });
+});
 
-      return c.res({
-        image: (
-          <div style={{
-            position: 'relative',
-            width: '1200px',
-            height: '628px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            overflow: 'hidden',
-          }}>
-            <style>{fontFace}</style>
-            <img 
-              src={BACKGROUND_IMAGE_URL}
-              style={{
-                position: 'absolute',
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
-            />
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              padding: '40px',
-            }}>
-              <div style={{
-                color: 'white',
-                fontSize: '32px',
-                fontWeight: 'bold',
-                fontFamily: 'Chalkduster, Arial, sans-serif',
-                marginBottom: '20px',
-              }}>
-                User Details for FID {fid}
-              </div>
-              <div style={{
-                color: 'white',
-                fontSize: '24px',
-                fontFamily: 'Chalkduster, Arial, sans-serif',
-                marginBottom: '10px',
-              }}>
-                Username: {userDetails.profileName || 'Unknown'}
-              </div>
-              <div style={{
-                color: 'white',
-                fontSize: '24px',
-                fontFamily: 'Chalkduster, Arial, sans-serif',
-                marginBottom: '10px',
-              }}>
-                Wallet: {userAddress}
-              </div>
-              <div style={{
-                color: 'white',
-                fontSize: '24px',
-                fontFamily: 'Chalkduster, Arial, sans-serif',
-                marginBottom: '10px',
-              }}>
-                Followers: {userDetails.followerCount}
-              </div>
-              <div style={{
-                color: 'white',
-                fontSize: '24px',
-                fontFamily: 'Chalkduster, Arial, sans-serif',
-                marginBottom: '10px',
-              }}>
-                Following: {userDetails.followingCount}
-              </div>
-              <div style={{
-                color: 'white',
-                fontSize: '24px',
-                fontFamily: 'Chalkduster, Arial, sans-serif',
-                marginBottom: '10px',
-              }}>
-                MASK Balance: {masksBalance}
-              </div>
-              <div style={{
-                color: 'white',
-                fontSize: '24px',
-                fontFamily: 'Chalkduster, Arial, sans-serif',
-                marginBottom: '10px',
-              }}>
-                $MASKS per tip: {masksPerTip}
-              </div>
-            </div>
-          </div>
-        ),
-        intents: [
-          <Button value="refresh">Refresh</Button>,
-        ],
-      });
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      return c.res({
-        image: (
-          <div style={{
-            position: 'relative',
-            width: '1200px',
-            height: '628px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflow: 'hidden',
-          }}>
-            <style>{fontFace}</style>
-            <img 
-              src={BACKGROUND_IMAGE_URL}
-              style={{
-                position: 'absolute',
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
-            />
-            <div style={{
-              color: 'white',
-              fontSize: '36px',
-              fontWeight: 'bold',
-              fontFamily: 'Chalkduster, Arial, sans-serif',
-              textAlign: 'center',
-            }}>
-              Error fetching user data<br/>
-              Please try again
-            </div>
-          </div>
-        ),
-        intents: [
-          <Button value="refresh">Try Again</Button>,
-        ],
-      });
-    }
+app.frame('/check', async (c) => {
+  const { fid } = c.frameData ?? {};
+  const { displayName } = c.var.interactor || {};
+
+  if (!fid) {
+    return c.res({
+      image: (
+        <div style={{
+          backgroundImage: `url(${BACKGROUND_IMAGE_URL})`,
+          width: '1200px',
+          height: '628px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: 'white',
+          fontSize: '40px',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          fontFamily: 'Chalkduster, Arial, sans-serif',
+        }}>
+          <style>{fontFace}</style>
+          <div>Unable to retrieve user information: No FID provided</div>
+        </div>
+      ),
+      intents: [
+        <Button action="/">Try Again</Button>
+      ],
+    });
   }
 
-  return c.res({
-    image: (
-      <div style={{
-        position: 'relative',
-        width: '1200px',
-        height: '628px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden',
-      }}>
-        <style>{fontFace}</style>
-        <img 
-          src={BACKGROUND_IMAGE_URL}
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-        />
+  try {
+    const userDetails = await getFarcasterUserDetails(fid.toString());
+    const userAddress = userDetails.connectedAddresses?.find((addr: ConnectedAddress) => addr.blockchain === 'ethereum')?.address || 'N/A';
+    const masksBalance = userAddress !== 'N/A' ? await getMasksBalance(userAddress) : 'N/A';
+    const masksPerTip = await getMasksPerTip();
+
+    return c.res({
+      image: (
         <div style={{
+          backgroundImage: `url(${BACKGROUND_IMAGE_URL})`,
+          width: '1200px',
+          height: '628px',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '20px',
           color: 'white',
-          fontSize: '48px',
           fontWeight: 'bold',
           fontFamily: 'Chalkduster, Arial, sans-serif',
-          textAlign: 'center',
         }}>
-          Masks Tipping Frame<br/>
-          <span style={{ fontSize: '24px' }}>Click to fetch your details</span>
+          <style>{fontFace}</style>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
+            <div style={{display: 'flex', flexDirection: 'column'}}>
+              <span style={{fontSize: '80px'}}>@{userDetails.profileName || displayName || 'Unknown'}</span>
+              <span style={{fontSize: '30px'}}>FID: {fid}</span>
+            </div>
+          </div>
+          
+          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '20px', fontSize: '38px'}}>
+            <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '10px'}}>
+              <span>Wallet:</span>
+              <span style={{fontWeight: '900', minWidth: '200px', textAlign: 'right'}}>{userAddress}</span>
+            </div>
+            <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '10px'}}>
+              <span>Followers:</span>
+              <span style={{fontWeight: '900', minWidth: '200px', textAlign: 'right'}}>{userDetails.followerCount}</span>
+            </div>
+            <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '10px'}}>
+              <span>Following:</span>
+              <span style={{fontWeight: '900', minWidth: '200px', textAlign: 'right'}}>{userDetails.followingCount}</span>
+            </div>
+            <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '10px'}}>
+              <span>MASK Balance:</span>
+              <span style={{fontWeight: '900', minWidth: '200px', textAlign: 'right'}}>{masksBalance}</span>
+            </div>
+            <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '10px'}}>
+              <span>$MASKS per tip:</span>
+              <span style={{fontWeight: '900', minWidth: '200px', textAlign: 'right'}}>{masksPerTip}</span>
+            </div>
+          </div>
         </div>
-      </div>
-    ),
-    intents: [<Button value="refresh">Check $MASKS</Button>],
-  });
+      ),
+      intents: [
+        <Button action="/">Home</Button>,
+        <Button action="/check">Refresh</Button>
+      ],
+    });
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return c.res({
+      image: (
+        <div style={{
+          backgroundImage: `url(${BACKGROUND_IMAGE_URL})`,
+          width: '1200px',
+          height: '628px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: 'white',
+          fontSize: '40px',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          fontFamily: 'Chalkduster, Arial, sans-serif',
+        }}>
+          <style>{fontFace}</style>
+          <div>Stats temporarily unavailable. Please try again later.</div>
+        </div>
+      ),
+      intents: [
+        <Button action="/check">Try Again</Button>
+      ],
+    });
+  }
 });
 
 export const GET = handle(app);

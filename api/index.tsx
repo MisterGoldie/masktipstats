@@ -14,16 +14,6 @@ const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 const fontPath = path.join(process.cwd(), 'public', 'fonts', 'Chalkduster.ttf');
 const fontBase64 = fs.readFileSync(fontPath, { encoding: 'base64' });
 
-// Create a CSS rule for the font
-const fontFace = `
-  @font-face {
-    font-family: 'Chalkduster';
-    src: url(data:font/truetype;charset=utf-8;base64,${fontBase64}) format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-`;
-
 export const app = new Frog({
   basePath: '/api',
   imageOptions: { width: 1200, height: 628 },
@@ -106,19 +96,43 @@ app.frame('/', async (c) => {
       const masksBalance = userAddress !== 'N/A' ? await getMasksBalance(userAddress) : 'N/A';
       const masksPerTip = await getMasksPerTip();
 
+      const imageContent = `
+        <html>
+          <head>
+            <style>
+              @font-face {
+                font-family: 'Chalkduster';
+                src: url(data:font/truetype;charset=utf-8;base64,${fontBase64}) format('truetype');
+              }
+              body {
+                font-family: 'Chalkduster';
+                background: linear-gradient(to right, #432889, #17101F);
+                color: white;
+                width: 1200px;
+                height: 628px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 20px;
+              }
+              h1 { font-size: 32px; margin-bottom: 20px; }
+              p { font-size: 24px; margin-bottom: 10px; }
+            </style>
+          </head>
+          <body>
+            <h1>User Details for FID ${fid}</h1>
+            <p>Username: ${userDetails.profileName || 'Unknown'}</p>
+            <p>Wallet: ${userAddress}</p>
+            <p>Followers: ${userDetails.followerCount}</p>
+            <p>Following: ${userDetails.followingCount}</p>
+            <p>MASK Balance: ${masksBalance}</p>
+            <p>$MASKS per tip: ${masksPerTip}</p>
+          </body>
+        </html>
+      `;
+
       return c.res({
-        image: (
-          <div style={{ width: '1200px', height: '628px', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Chalkduster, Arial, sans-serif', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <style>{fontFace}</style>
-            <div style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {fid}</div>
-            <div style={{ fontSize: '24px', marginBottom: '10px' }}>Username: {userDetails.profileName || 'Unknown'}</div>
-            <div style={{ fontSize: '24px', marginBottom: '10px' }}>Wallet: {userAddress}</div>
-            <div style={{ fontSize: '24px', marginBottom: '10px' }}>Followers: {userDetails.followerCount}</div>
-            <div style={{ fontSize: '24px', marginBottom: '10px' }}>Following: {userDetails.followingCount}</div>
-            <div style={{ fontSize: '24px', marginBottom: '10px' }}>MASK Balance: {masksBalance}</div>
-            <div style={{ fontSize: '24px', marginBottom: '10px' }}>$MASKS per tip: {masksPerTip}</div>
-          </div>
-        ),
+        image: imageContent,
         intents: [
           <Button value="refresh">Refresh</Button>,
         ],
@@ -126,13 +140,36 @@ app.frame('/', async (c) => {
     } catch (error) {
       console.error('Error fetching user data:', error);
       return c.res({
-        image: (
-          <div style={{ width: '1200px', height: '628px', background: 'linear-gradient(to right, #FF0000, #8B0000)', color: 'white', fontFamily: 'Chalkduster, Arial, sans-serif', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-            <style>{fontFace}</style>
-            <div style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '20px' }}>Error fetching user data</div>
-            <div style={{ fontSize: '24px' }}>Please try again</div>
-          </div>
-        ),
+        image: `
+          <html>
+            <head>
+              <style>
+                @font-face {
+                  font-family: 'Chalkduster';
+                  src: url(data:font/truetype;charset=utf-8;base64,${fontBase64}) format('truetype');
+                }
+                body {
+                  font-family: 'Chalkduster';
+                  background: linear-gradient(to right, #FF0000, #8B0000);
+                  color: white;
+                  width: 1200px;
+                  height: 628px;
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+                  align-items: center;
+                  padding: 20px;
+                }
+                h1 { font-size: 36px; margin-bottom: 20px; }
+                p { font-size: 24px; }
+              </style>
+            </head>
+            <body>
+              <h1>Error fetching user data</h1>
+              <p>Please try again</p>
+            </body>
+          </html>
+        `,
         intents: [
           <Button value="refresh">Try Again</Button>,
         ],
@@ -141,13 +178,36 @@ app.frame('/', async (c) => {
   }
 
   return c.res({
-    image: (
-      <div style={{ width: '1200px', height: '628px', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily: 'Chalkduster, Arial, sans-serif', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-        <style>{fontFace}</style>
-        <div style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '20px' }}>Masks Tipping Frame</div>
-        <div style={{ fontSize: '24px' }}>Click to fetch your details</div>
-      </div>
-    ),
+    image: `
+      <html>
+        <head>
+          <style>
+            @font-face {
+              font-family: 'Chalkduster';
+              src: url(data:font/truetype;charset=utf-8;base64,${fontBase64}) format('truetype');
+            }
+            body {
+              font-family: 'Chalkduster';
+              background: linear-gradient(to right, #432889, #17101F);
+              color: white;
+              width: 1200px;
+              height: 628px;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              padding: 20px;
+            }
+            h1 { font-size: 48px; margin-bottom: 20px; }
+            p { font-size: 24px; }
+          </style>
+        </head>
+        <body>
+          <h1>Masks Tipping Frame</h1>
+          <p>Click to fetch your details</p>
+        </body>
+      </html>
+    `,
     intents: [<Button value="refresh">Check $MASKS</Button>],
   });
 });

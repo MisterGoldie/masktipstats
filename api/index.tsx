@@ -9,20 +9,20 @@ const MASKS_RANK_API_URL = 'https://app.masks.wtf/api/rank';
 const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 
-// Tailwind-inspired styles
+// Tailwind-inspired styles with explicit flex display
 const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
     height: '100%',
-    background: 'linear-gradient(to right, #4338ca, #1e1b4b)', // Tailwind indigo-700 to indigo-900
+    background: 'linear-gradient(to right, #4338ca, #1e1b4b)',
     color: 'white',
     fontFamily: 'Inter, sans-serif',
     padding: '2rem',
   },
   header: {
-    fontSize: '2.25rem', // text-4xl
+    fontSize: '2.25rem',
     fontWeight: 'bold',
     marginBottom: '1.5rem',
     textShadow: '0 2px 4px rgba(0,0,0,0.1)',
@@ -36,13 +36,13 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    fontSize: '1.125rem', // text-lg
+    fontSize: '1.125rem',
     padding: '0.5rem',
-    borderRadius: '0.375rem', // rounded-md
-    backgroundColor: 'rgba(255, 255, 255, 0.1)', // bg-white bg-opacity-10
+    borderRadius: '0.375rem',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   label: {
-    fontWeight: '500', // font-medium
+    fontWeight: '500',
   },
   value: {
     fontWeight: 'bold',

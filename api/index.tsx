@@ -2,31 +2,34 @@ import { Button, Frog } from 'frog';
 import { handle } from 'frog/vercel';
 import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
+import fs from 'fs';
+import path from 'path';
 
 const MASKS_BALANCE_API_URL = 'https://app.masks.wtf/api/balance';
 const MASKS_PER_TIP_API_URL = 'https://app.masks.wtf/api/masksPerTip';
 const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 
-// Import the custom font
-const fontFamily = "Inter, sans-serif";
-const fontImport = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+// Read and encode the TTF file
+const fontPath = path.join(process.cwd(), 'public', 'fonts', 'Chalkduster.ttf');
+const fontBase64 = fs.readFileSync(fontPath, { encoding: 'base64' });
+
+// Create a CSS rule for the font
+const fontFace = `
+  @font-face {
+    font-family: 'Chalkduster';
+    src: url(data:font/truetype;charset=utf-8;base64,${fontBase64}) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
 `;
 
 export const app = new Frog({
   basePath: '/api',
   imageOptions: { width: 1200, height: 628 },
   title: '$Masks Token Tracker',
-  hub: {
-    apiUrl: "https://hubs.airstack.xyz",
-    fetchOptions: {
-      headers: {
-        "x-airstack-hubs": "103ba30da492d4a7e89e7026a6d3a234e",
-      }
-    }
-  }
-}).use(
+})
+.use(
   neynar({
     apiKey: 'NEYNAR_FROG_FM',
     features: ['interactor', 'cast'],
@@ -105,15 +108,15 @@ app.frame('/', async (c) => {
 
       return c.res({
         image: (
-          <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily, padding: '20px' }}>
-            <style>{fontImport}</style>
-            <div style={{ display: 'flex', fontSize: 32, fontWeight: 'bold', marginBottom: '20px' }}>User Details for FID {fid}</div>
-            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Username: {userDetails.profileName || 'Unknown'}</div>
-            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Wallet: {userAddress}</div>
-            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Followers: {userDetails.followerCount}</div>
-            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Following: {userDetails.followingCount}</div>
-            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>MASK Balance: {masksBalance}</div>
-            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>$MASKS per tip: {masksPerTip}</div>
+          <div style={{ fontFamily: 'CustomFont, sans-serif', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', width: '100%', height: '100%', padding: '20px' }}>
+            <style>{fontFace}</style>
+            <h1 style={{ fontSize: '32px', marginBottom: '20px' }}>User Details for FID {fid}</h1>
+            <p style={{ fontSize: '24px', marginBottom: '10px' }}>Username: {userDetails.profileName || 'Unknown'}</p>
+            <p style={{ fontSize: '24px', marginBottom: '10px' }}>Wallet: {userAddress}</p>
+            <p style={{ fontSize: '24px', marginBottom: '10px' }}>Followers: {userDetails.followerCount}</p>
+            <p style={{ fontSize: '24px', marginBottom: '10px' }}>Following: {userDetails.followingCount}</p>
+            <p style={{ fontSize: '24px', marginBottom: '10px' }}>MASK Balance: {masksBalance}</p>
+            <p style={{ fontSize: '24px', marginBottom: '10px' }}>$MASKS per tip: {masksPerTip}</p>
           </div>
         ),
         intents: [
@@ -124,10 +127,10 @@ app.frame('/', async (c) => {
       console.error('Error fetching user data:', error);
       return c.res({
         image: (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #FF0000, #8B0000)', color: 'white', fontFamily, padding: '20px' }}>
-            <style>{fontImport}</style>
-            <div style={{ display: 'flex', fontSize: 36, fontWeight: 'bold', marginBottom: '20px' }}>Error fetching user data</div>
-            <div style={{ display: 'flex', fontSize: 24 }}>Please try again</div>
+          <div style={{ fontFamily: 'CustomFont, sans-serif', background: 'linear-gradient(to right, #FF0000, #8B0000)', color: 'white', width: '100%', height: '100%', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <style>{fontFace}</style>
+            <h1 style={{ fontSize: '36px', marginBottom: '20px' }}>Error fetching user data</h1>
+            <p style={{ fontSize: '24px' }}>Please try again</p>
           </div>
         ),
         intents: [
@@ -139,10 +142,10 @@ app.frame('/', async (c) => {
 
   return c.res({
     image: (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', fontFamily, padding: '20px' }}>
-        <style>{fontImport}</style>
-        <div style={{ display: 'flex', fontSize: 48, fontWeight: 'bold', marginBottom: '20px' }}>Masks Tipping Frame</div>
-        <div style={{ display: 'flex', fontSize: 24 }}>Click to fetch your details</div>
+      <div style={{ fontFamily: 'CustomFont, sans-serif', background: 'linear-gradient(to right, #432889, #17101F)', color: 'white', width: '100%', height: '100%', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <style>{fontFace}</style>
+        <h1 style={{ fontSize: '48px', marginBottom: '20px' }}>Masks Tipping Frame</h1>
+        <p style={{ fontSize: '24px' }}>Click to fetch your details</p>
       </div>
     ),
     intents: [<Button value="refresh">Check $MASKS</Button>],

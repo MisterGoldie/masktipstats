@@ -9,7 +9,7 @@ const MASKS_PER_TIP_API_URL = 'https://app.masks.wtf/api/masksPerTip';
 const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 
-export const app = new Frog({ //Always include if using Airstack so it tracks moxie
+export const app = new Frog({
   basePath: '/api',
   imageOptions: { width: 1200, height: 628 },
   title: '$Masks Token Tracker',
@@ -40,6 +40,7 @@ async function getFarcasterUserDetails(fid: string) {
           profileImage
           followerCount
           followingCount
+          userAssociatedAddresses
         }
       }
     }
@@ -58,6 +59,12 @@ async function getFarcasterUserDetails(fid: string) {
   return data.data.Socials.Social[0];
 }
 
+async function getMasksBalance(address: string): Promise<string> {
+  const response = await fetch(`${MASKS_BALANCE_API_URL}?address=${address}`);
+  const data = await response.json();
+  return data.MASK || 'N/A';
+}
+
 async function getMasksPerTip(): Promise<number> {
   const response = await fetch(MASKS_PER_TIP_API_URL);
   const data = await response.json();
@@ -71,8 +78,8 @@ app.frame('/', async (c) => {
   if (buttonValue === 'get_user_details' && fid) {
     try {
       const userDetails = await getFarcasterUserDetails(fid);
-      const balanceResponse = await fetch(`${MASKS_BALANCE_API_URL}?fid=${fid}`);
-      const balanceData = await balanceResponse.json();
+      const userAddress = userDetails.userAssociatedAddresses?.[0];
+      const masksBalance = userAddress ? await getMasksBalance(userAddress) : 'N/A';
       const masksPerTip = await getMasksPerTip();
 
       return c.res({
@@ -82,7 +89,7 @@ app.frame('/', async (c) => {
             <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Username: {userDetails.userId || 'Unknown'}</div>
             <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Followers: {userDetails.followerCount}</div>
             <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>Following: {userDetails.followingCount}</div>
-            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>MASK Balance: {balanceData.MASK || 'N/A'}</div>
+            <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>MASK Balance: {masksBalance}</div>
             <div style={{ display: 'flex', fontSize: 24, marginBottom: '10px' }}>$MASKS per tip: {masksPerTip}</div>
           </div>
         ),
@@ -116,7 +123,6 @@ app.frame('/', async (c) => {
     intents: [<Button value="get_user_details">Check $MASKS</Button>],
   });
 });
-
 
 export const GET = handle(app);
 export const POST = handle(app);

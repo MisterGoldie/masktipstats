@@ -7,6 +7,7 @@ const MASKS_BALANCE_API_URL = 'https://app.masks.wtf/api/balance';
 const MASKS_PER_TIP_API_URL = 'https://app.masks.wtf/api/masksPerTip';
 const AIRSTACK_API_KEY = '103ba30da492d4a7e89e7026a6d3a234e';
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
+const BACKGROUND_IMAGE_URL = 'https://bafybeiajbch2tb6veul2ydzqmzc62arz5vtpbycei3fcyehase5amv62we.ipfs.w3s.link/Frame%2059%20(5).png';
 
 export const app = new Frog({
   basePath: '/api',
@@ -91,21 +92,15 @@ app.frame('/', async (c) => {
       const masksPerTip = await getMasksPerTip();
 
       const imageContent = `
-        <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:#432889;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#17101F;stop-opacity:1" />
-            </linearGradient>
-          </defs>
-          <rect width="1200" height="628" fill="url(#grad)"/>
-          <text x="50" y="80" font-family="Courier, monospace" font-size="32" fill="white" font-weight="bold">User Details for FID ${fid}</text>
-          <text x="50" y="140" font-family="Courier, monospace" font-size="24" fill="white">Username: ${userDetails.profileName || 'Unknown'}</text>
-          <text x="50" y="190" font-family="Courier, monospace" font-size="24" fill="white">Wallet: ${userAddress}</text>
-          <text x="50" y="240" font-family="Courier, monospace" font-size="24" fill="white">Followers: ${userDetails.followerCount}</text>
-          <text x="50" y="290" font-family="Courier, monospace" font-size="24" fill="white">Following: ${userDetails.followingCount}</text>
-          <text x="50" y="340" font-family="Courier, monospace" font-size="24" fill="white">MASK Balance: ${masksBalance}</text>
-          <text x="50" y="390" font-family="Courier, monospace" font-size="24" fill="white">$MASKS per tip: ${masksPerTip}</text>
+        <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <image href="${BACKGROUND_IMAGE_URL}" width="1200" height="628"/>
+          <text x="50" y="80" font-family="Arial, sans-serif" font-size="32" fill="white" font-weight="bold">User Details for FID ${fid}</text>
+          <text x="50" y="140" font-family="Arial, sans-serif" font-size="24" fill="white">Username: ${userDetails.profileName || 'Unknown'}</text>
+          <text x="50" y="190" font-family="Arial, sans-serif" font-size="24" fill="white">Wallet: ${userAddress}</text>
+          <text x="50" y="240" font-family="Arial, sans-serif" font-size="24" fill="white">Followers: ${userDetails.followerCount}</text>
+          <text x="50" y="290" font-family="Arial, sans-serif" font-size="24" fill="white">Following: ${userDetails.followingCount}</text>
+          <text x="50" y="340" font-family="Arial, sans-serif" font-size="24" fill="white">MASK Balance: ${masksBalance}</text>
+          <text x="50" y="390" font-family="Arial, sans-serif" font-size="24" fill="white">$MASKS per tip: ${masksPerTip}</text>
         </svg>
       `;
 
@@ -119,10 +114,10 @@ app.frame('/', async (c) => {
       console.error('Error fetching user data:', error);
       return c.res({
         image: `
-          <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg">
-            <rect width="1200" height="628" fill="#FF0000"/>
-            <text x="600" y="300" font-family="Courier, monospace" font-size="36" fill="white" text-anchor="middle">Error fetching user data</text>
-            <text x="600" y="350" font-family="Courier, monospace" font-size="24" fill="white" text-anchor="middle">Please try again</text>
+          <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <image href="${BACKGROUND_IMAGE_URL}" width="1200" height="628"/>
+            <text x="600" y="300" font-family="Arial, sans-serif" font-size="36" fill="white" text-anchor="middle">Error fetching user data</text>
+            <text x="600" y="350" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">Please try again</text>
           </svg>
         `,
         intents: [
@@ -134,16 +129,10 @@ app.frame('/', async (c) => {
 
   return c.res({
     image: `
-      <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#432889;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#17101F;stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <rect width="1200" height="628" fill="url(#grad)"/>
-        <text x="600" y="300" font-family="Courier, monospace" font-size="48" fill="white" text-anchor="middle" font-weight="bold">Masks Tipping Frame</text>
-        <text x="600" y="360" font-family="Courier, monospace" font-size="24" fill="white" text-anchor="middle">Click to fetch your details</text>
+      <svg width="1200" height="628" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <image href="${BACKGROUND_IMAGE_URL}" width="1200" height="628"/>
+        <text x="600" y="300" font-family="Arial, sans-serif" font-size="48" fill="white" text-anchor="middle" font-weight="bold">Masks Tipping Frame</text>
+        <text x="600" y="360" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">Click to fetch your details</text>
       </svg>
     `,
     intents: [<Button value="refresh">Check $MASKS</Button>],
